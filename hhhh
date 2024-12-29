@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交通工具資訊地圖</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background: linear-gradient(to bottom, #6a11cb, #2575fc);
+            color: white;
+        }
+        .header {
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10%;
+        }
+        .transport-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .transport-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+        .sub-button-container {
+            margin-top: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sub-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .sub-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+        .search-container {
+            margin-top: 10px;
+            display: none;
+        }
+        .search-input {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 5px;
+        }
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .search-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            width: 100%;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        let userLatitude = null;
+        let userLongitude = null;
+
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        userLatitude = latitude;
+                        userLongitude = longitude;
+                    },
+                    () => {
+                        alert('無法獲取您的位置信息');
+                    }
+                );
+            } else {
+                alert('您的瀏覽器不支持定位功能');
+            }
+        }
+
+        function openGoogleMaps(query) {
+            if (userLatitude !== null && userLongitude !== null) {
+                const url = `https://www.google.com/maps/@${userLatitude},${userLongitude},14z?q=${encodeURIComponent(query)}`;
+                window.open(url, '_blank');
+            } else {
+                alert('正在獲取您的位置，請稍後再試。');
+            }
+        }
+
+        function showSubButtons(buttonId) {
+            const subContainer = document.getElementById(buttonId + '-sub-buttons');
+            if (subContainer.style.display === 'none' || !subContainer.style.display) {
+                subContainer.style.display = 'flex';
+            } else {
+                subContainer.style.display = 'none';
+            }
+        }
+
+        function showSearchBox(buttonId, query) {
+            const searchContainer = document.getElementById(buttonId + '-search-container');
+            if (searchContainer.style.display === 'none' || !searchContainer.style.display) {
+                searchContainer.style.display = 'block';
+            } else {
+                searchContainer.style.display = 'none';
+            }
+        }
+
+        function performSearch(buttonId, query) {
+            const searchInput = document.getElementById(buttonId + '-search-input').value;
+            if (searchInput) {
+                const url = `https://www.google.com/maps/search/${encodeURIComponent(query)}+near+${encodeURIComponent(searchInput)}`;
+                window.open(url, '_blank');
+            } else {
+                alert('請輸入搜尋位置');
+            }
+        }
+
+        window.onload = getUserLocation;
+    </script>
+</head>
+<body>
+    <div class="header">交通工具資訊地圖</div>
+    <div class="button-container">
+        <div>
+            <button class="transport-button" onclick="showSubButtons('ubike')">Ubike</button>
+            <div id="ubike-sub-buttons" class="sub-button-container">
+                <button class="sub-button" onclick="openGoogleMaps('Ubike')">目前位置</button>
+                <button class="sub-button" onclick="showSearchBox('ubike', 'Ubike')">搜尋位置</button>
+                <div id="ubike-search-container" class="search-container">
+                    <input id="ubike-search-input" class="search-input" type="text" placeholder="輸入搜尋位置">
+                    <button class="search-button" onclick="performSearch('ubike', 'Ubike')">搜尋</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="transport-button" onclick="showSubButtons('mrt')">捷運</button>
+            <div id="mrt-sub-buttons" class="sub-button-container">
+                <button class="sub-button" onclick="openGoogleMaps('MRT stations')">目前位置</button>
+                <button class="sub-button" onclick="showSearchBox('mrt', 'MRT stations')">搜尋位置</button>
+                <div id="mrt-search-container" class="search-container">
+                    <input id="mrt-search-input" class="search-input" type="text" placeholder="輸入搜尋位置">
+                    <button class="search-button" onclick="performSearch('mrt', 'MRT stations')">搜尋</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="transport-button" onclick="showSubButtons('train')">火車</button>
+            <div id="train-sub-buttons" class="sub-button-container">
+                <button class="sub-button" onclick="openGoogleMaps('Train stations')">目前位置</button>
+                <button class="sub-button" onclick="showSearchBox('train', 'Train stations')">搜尋位置</button>
+                <div id="train-search-container" class="search-container">
+                    <input id="train-search-input" class="search-input" type="text" placeholder="輸入搜尋位置">
+                    <button class="search-button" onclick="performSearch('train', 'Train stations')">搜尋</button>
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="transport-button" onclick="showSubButtons('bus')">公車站</button>
+            <div id="bus-sub-buttons" class="sub-button-container">
+                <button class="sub-button" onclick="openGoogleMaps('Bus stops')">目前位置</button>
+                <button class="sub-button" onclick="showSearchBox('bus', 'Bus stops')">搜尋位置</button>
+                <div id="bus-search-container" class="search-container">
+                    <input id="bus-search-input" class="search-input" type="text" placeholder="輸入搜尋位置">
+                    <button class="search-button" onclick="performSearch('bus', 'Bus stops')">搜尋</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">提供附近交通資訊服務</div>
+</body>
+</html>
